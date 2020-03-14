@@ -6,4 +6,8 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+router.post('/freqreport', function(req, res) {
+  res.send('POST request: ' + JSON.stringify(req.body));
+});
+
 module.exports = router;
