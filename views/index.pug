@@ -1,5 +1,21 @@
 extends layout
 
 block content
-  h1= "Vocabulary Dashboard"
-  p #{word}
+  table(class='flashcard')
+    tr
+      th 尴
+      th 尬
+      th 车
+    tr
+      td(class='pinyin') chū
+      td(class='pinyin') zū
+      td(class='pinyin') chē
+    tr
+      td(class='hanviet') [xuất, xúy]
+      td(class='hanviet') [tô]
+      td(class='hanviet') [xa]
+
+  //- div(class='flashcard')
+  //-   h1 #{word}
+  //-   h4 chū zū chē
+  //-   h4 [xuất, xúy] [tô] [xa]
