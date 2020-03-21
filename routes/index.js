@@ -2,8 +2,14 @@ var express = require('express');
 var router = express.Router();
 const sqlite3 = require('sqlite3').verbose();
 
-// TODO: Make this persisting to a file instead of memory.
-let db = new sqlite3.Database(':memory:');
+let db = new sqlite3.Database('./db/vocab.db', (err) => {
+  if (err) {
+    console.error(err.message);
+  } else {
+    console.log('Connected to the vocab database.');
+  }
+});
+
 db.exec(`
 CREATE TABLE IF NOT EXISTS FrequencyReports (
   Word TEXT NOT NULL,
@@ -11,8 +17,10 @@ CREATE TABLE IF NOT EXISTS FrequencyReports (
   Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO FrequencyReports (Word, Frequency) VALUES ('出租车', 100);
-INSERT INTO FrequencyReports (Word, Frequency) VALUES ('新冠病毒', 100);
+CREATE TABLE IF NOT EXISTS HanVietDictionary (
+  Character TEXT NOT NULL,
+  HanViet TEXT NOT NULL
+);
 `)
 
 /* GET home page. */
@@ -35,8 +43,34 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/freqreport', function(req, res) {
-  // TODO: Insert to FrequencyReports table here.
-  res.send('POST request: ' + JSON.stringify(req.body));
+  // {"传 [傳]":{"frequency":1,"lastLookupTime":1584261521895},"山楂":{"frequency":1,"lastLookupTime":1584261596686}}
+  console.log(req.body);
+  var frequencyReport = req.body;
+
+  for (const word of Object.keys(frequencyReport)) {
+      var command = "INSERT INTO FrequencyReports (Word, Frequency, Timestamp) VALUES ('"
+                    + word + "', "
+                    + frequencyReport[word].frequency + ", "
+                    + frequencyReport[word].lastLookupTime + ");"
+      db.exec(command)
+  }
+
+  res.send('Acknowledged.');
+});
+
+router.post('/hvreport', function(req, res) {
+  // {"内":"nội, nạp","向":"hướng"}
+  console.log(req.body);
+  var hanvietReport = req.body;
+
+  for (const character of Object.keys(hanvietReport)) {
+      var command = "INSERT OR IGNORE INTO HanVietDictionary (Character, HanViet) VALUES ('"
+                    + character + "', '"
+                    + hanvietReport[character] + "');"
+      db.exec(command)
+  }
+
+  res.send('Acknowledged.');
 });
 
 module.exports = router;
