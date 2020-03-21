@@ -1,8 +1,45 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
-
 a {
   color: #00B7FF;
+}
+
+body {
+  background-color: gray;
+}
+
+.flashcard {
+  border: gray;
+  border-style: solid;
+  padding: 20px 100px 20px 100px;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+}
+
+table {
+  table-layout: fixed;
+}
+
+td, th {
+  text-align: center;
+  width: 280px;
+}
+
+th {
+  font: 220px Verdana, sans-serif;
+}
+
+td {
+  font: 40px Verdana, sans-serif;
+}
+
+.pinyin {
+  color: lightgrey;
+}
+
+.hanviet {
+  font-style: italic;
+  color: gray;
 }
