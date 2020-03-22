@@ -9,7 +9,7 @@ body {
 .flashcard {
   border: gray;
   border-style: solid;
-  padding: 20px 100px 20px 100px;
+  padding: 30px 100px 30px 100px;
 
   position: fixed;
   top: 50%;
@@ -27,19 +27,32 @@ td, th {
   width: 280px;
 }
 
-th {
-  font: 220px Verdana, sans-serif;
-}
-
 td {
   font: 40px Verdana, sans-serif;
 }
 
+.simplified {
+  font: 220px Verdana, sans-serif;
+  line-height: 95%;
+}
+
+.traditional {
+  font: 160px Verdana, sans-serif;
+  color: grey;
+}
+
 .pinyin {
-  color: lightgrey;
+  color: gray;
+  padding-top: 30px;
+  padding-bottom: 10px;
 }
 
 .hanviet {
   font-style: italic;
   color: gray;
+  padding-bottom: 10px;
+}
+
+.definition {
+  font: 25px "Georgia", sans-serif;
 }
