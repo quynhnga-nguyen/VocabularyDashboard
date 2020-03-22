@@ -27,13 +27,19 @@ let db = new sqlite3.Database('./db/vocab.db', (err) => {
 db.exec(`
 CREATE TABLE IF NOT EXISTS FrequencyReports (
   Word TEXT NOT NULL,
-  Definition TEXT,
   Frequency INTEGER,
   Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS PinyinAndDefinitions (
+  Word TEXT NOT NULL,
+  Pinyin TEXT NOT NULL,
+  Definition TEXT,
+  PRIMARY KEY (Word, Pinyin)
+);
+
 CREATE TABLE IF NOT EXISTS HanVietDictionary (
-  Character TEXT NOT NULL,
+  Character TEXT NOT NULL PRIMARY KEY,
   HanViet TEXT NOT NULL
 );
 `);
@@ -54,17 +60,24 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/freqreport', function(req, res) {
-  // request body sample: {"传 [傳]":{"frequency":1,"lastLookupTime":1584261521895},"山楂":{"frequency":1,"lastLookupTime":1584261596686}}
+  // request body sample: [{"word":"罢了 [罷-]","frequency":1,"lastLookupTime":1584873114918,
+  // "pinyinAndDefinition":[{"pinyin":"bàle","definition":["a modal particle indicating (that's all, only, nothing much)"]}]}
   console.log(req.body);
   var frequencyReport = req.body;
 
-  for (const word of Object.keys(frequencyReport)) {
-    db.run("INSERT INTO FrequencyReports (Word, Definition, Frequency, Timestamp) VALUES (?, ?, ?, ?)",
-            word,
-            concatDefinitions(frequencyReport[word].definition),
-            frequencyReport[word].frequency,
-            frequencyReport[word].lastLookupTime);
-  }
+  frequencyReport.forEach(function(item) {
+    db.run("INSERT INTO FrequencyReports (Word, Frequency, Timestamp) VALUES (?, ?, ?)",
+            item.word,
+            item.frequency,
+            item.lastLookupTime);
+
+    item.pinyinAndDefinition.forEach(function(pyAndDef) {
+      db.run("INSERT OR IGNORE INTO PinyinAndDefinitions (Word, Pinyin, Definition) VALUES (?, ?, ?)",
+              item.word,
+              pyAndDef.pinyin,
+              concatDefinitions(pyAndDef.definition));
+    });
+  });
 
   res.send('Acknowledged.');
 });
