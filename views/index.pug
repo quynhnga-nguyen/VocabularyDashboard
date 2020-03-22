@@ -7,26 +7,49 @@ block content
       th(class='simplified') 尬
       th(class='simplified') 车
 
-    tr
+    tr(class='front')
       th(class='traditional') 尷
       th(class='traditional') 
       th(class='traditional') 車
-    tr
+    tr(class='front')
       td(class='hanviet') [xuất, xúy]
       td(class='hanviet') [tô]
       td(class='hanviet') [xa]
 
-    tr
+    tr(class='back')
       td(class='pinyin') chū
       td(class='pinyin') zū
       td(class='pinyin') chē
-    tr
+    tr(class='back')
       td(colspan="3" , class="definition")
         span= "finish/ complete"
-    tr
-      td(class='pinyin') chū
-      td(class='pinyin') zū
-      td(class='pinyin') chē
-    tr
+    tr(class='back')
+      td(class='pinyin back') chū
+      td(class='pinyin back') zū
+      td(class='pinyin back') chē
+    tr(class='back')
       td(colspan="3", class="definition")
         span= "a particle of a sentence that implies past tense or completion of something"
+
+  script. 
+    function getOtherSide(currentSide) {
+      if (currentSide === 'front') {
+        return 'back';
+      } else {
+        return 'front';
+      }
+    }
+
+    var currentSide = 'back';
+
+    function flipSide() {
+      currentSide = getOtherSide(currentSide);
+      for (element of document.getElementsByClassName(getOtherSide(currentSide))) {
+        element.style.display = "none";
+      }
+      for (element of document.getElementsByClassName(currentSide)) {
+        element.style.display = "";
+      }
+    }
+    setInterval(flipSide, 3000);
+    flipSide();
