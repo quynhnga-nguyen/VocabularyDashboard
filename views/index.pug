@@ -3,19 +3,30 @@ extends layout
 block content
   table(class='flashcard')
     tr
-      th 尴
-      th 尬
-      th 车
+      th(class='simplified') 尴
+      th(class='simplified') 尬
+      th(class='simplified') 车
+
     tr
-      td(class='pinyin') chū
-      td(class='pinyin') zū
-      td(class='pinyin') chē
+      th(class='traditional') 尷
+      th(class='traditional') 
+      th(class='traditional') 車
     tr
       td(class='hanviet') [xuất, xúy]
       td(class='hanviet') [tô]
       td(class='hanviet') [xa]
 
-  //- div(class='flashcard')
-  //-   h1 #{word}
-  //-   h4 chū zū chē
-  //-   h4 [xuất, xúy] [tô] [xa]
+    tr
+      td(class='pinyin') chū
+      td(class='pinyin') zū
+      td(class='pinyin') chē
+    tr
+      td(colspan="3" , class="definition")
+        span= "finish/ complete"
+    tr
+      td(class='pinyin') chū
+      td(class='pinyin') zū
+      td(class='pinyin') chē
+    tr
+      td(colspan="3", class="definition")
+        span= "a particle of a sentence that implies past tense or completion of something"
