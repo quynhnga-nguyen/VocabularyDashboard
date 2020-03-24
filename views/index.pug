@@ -1,55 +1,48 @@
 extends layout
 
 block content
-  table(class='flashcard')
+  table(class='flashcard' id='flashcard-tbl')
     tr
-      th(class='simplified') 尴
-      th(class='simplified') 尬
-      th(class='simplified') 车
+      th(class='simplified', v-for='char in currentWord.simplified') {{char}}
 
-    tr(class='front')
-      th(class='traditional') 尷
-      th(class='traditional') 
-      th(class='traditional') 車
-    tr(class='front')
-      td(class='hanviet') [xuất, xúy]
-      td(class='hanviet') [tô]
-      td(class='hanviet') [xa]
+    tr(class='front', v-if='currentSide === "front"')
+      th(class='traditional', v-for='char in currentWord.traditional') {{char}}
+    tr(class='front', v-if='currentSide === "front"')
+      td(class='hanviet', v-for='hv in currentWord.hanviet') {{hv}}
 
-    tr(class='back')
-      td(class='pinyin') chū
-      td(class='pinyin') zū
-      td(class='pinyin') chē
-    tr(class='back')
-      td(colspan="3" , class="definition")
-        span= "finish/ complete"
-    tr(class='back')
-      td(class='pinyin') chū
-      td(class='pinyin') zū
-      td(class='pinyin') chē
-    tr(class='back')
-      td(colspan="3", class="definition")
-        span= "a particle of a sentence that implies past tense or completion of something"
+    template(v-for='pinyinAndDef in currentWord.pinyinAndDefinitions')
+      tr(class='back', v-if='currentSide === "back"')
+        td(class='pinyin' v-for='p in pinyinAndDef.pinyin') {{p}}
+      tr(class='back', v-if='currentSide === "back"')
+        td(colspan="3" , class="definition")
+          span {{pinyinAndDef.definition}}
 
   script. 
-    function getOtherSide(currentSide) {
-      if (currentSide === 'front') {
-        return 'back';
-      } else {
-        return 'front';
-      }
-    }
+    var app6 = new Vue({
+      el: '#flashcard-tbl',
+      data: {
+        words: !{JSON.stringify(words)},
+        currentWord: {},
+        currentIdx: 0,
+        currentSide: 'front',
+      },
+      methods: {
+        displayNext: function() {
+          this.currentIdx = (this.currentIdx + 1) % 2;
+          this.currentWord = this.words[this.currentIdx];
+        },
+        flipSide: function() {
+          if (this.currentSide === 'front') {
+            this.currentSide = 'back';
+          } else {
+            this.currentSide = 'front';
+          }
+        }
+      },
+      created() {
+        this.currentWord = this.words[0];
+      },
+    });
 
-    var currentSide = 'back';
-
-    function flipSide() {
-      currentSide = getOtherSide(currentSide);
-      for (element of document.getElementsByClassName(getOtherSide(currentSide))) {
-        element.style.display = "none";
-      }
-      for (element of document.getElementsByClassName(currentSide)) {
-        element.style.display = "";
-      }
-    }
-    setInterval(flipSide, 3000);
-    flipSide();
+    setInterval(function() { app6.flipSide(); }, 3000);
+    setInterval(function() { app6.displayNext(); }, 12000);

@@ -55,7 +55,29 @@ router.get('/', function(req, res, next) {
         throw err;
       }
       const randomIndex = Math.floor(Math.random() * topWords.length);
-      res.render('index', { word: topWords[randomIndex].Word });
+      res.render('index', {
+        // word: topWords[randomIndex].Word
+        words: [{
+          simplified: ['尴', '尬', '车'],
+          traditional: ['尷', '', '車'],
+          hanviet: ['[xuất, xúy]', '[tô]', '[xa]'],
+          pinyinAndDefinitions: [{
+            pinyin: ['chū', 'zū', 'chē'],
+            definition: 'finish/ complete'
+          }, {
+            pinyin: ['chū', 'zū', 'chē'],
+            definition: 'a particle of a sentence that implies past tense or completion of something'
+          }]
+        }, {
+          simplified: ['天', '下'],
+          traditional: ['天', '下'],
+          hanviet: ['[thiên]', '[hạ, há]'],
+          pinyinAndDefinitions: [{
+            pinyin: ['tiān', 'xià'],
+            definition: 'the world'
+          }]
+        }]
+      });
     });
 });
 
