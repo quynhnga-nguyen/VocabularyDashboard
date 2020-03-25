@@ -11,10 +11,12 @@ block content
       td(class='hanviet', v-for='char in currentWord.simplified') [{{hanviet[char]}}]
 
     template(v-for='pinyinAndDef in currentWord.pinyinAndDefinitions')
+      //- tr(class='back', v-if='currentSide === "back"')
+      //-   td(class='pinyin' v-for='p in pinyinAndDef.pinyin') {{p}}
       tr(class='back', v-if='currentSide === "back"')
-        td(class='pinyin' v-for='p in pinyinAndDef.pinyin') {{p}}
+        td(colspan='3', class='pinyin') {{pinyinAndDef.pinyin}}
       tr(class='back', v-if='currentSide === "back"')
-        td(colspan="3" , class="definition")
+        td(colspan='3', class='definition')
           span {{pinyinAndDef.definition}}
 
   script. 
