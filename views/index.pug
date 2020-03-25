@@ -37,9 +37,14 @@ block content
           } else {
             this.currentSide = 'front';
           }
-        }
+        },
       },
       created() {
+        this.words.forEach(word => {
+          let match = /(?<simplified>[^ ]*)(?: \[(?<traditional>.*)\])?/.exec(word.word);
+          word.simplified = match.groups.simplified;
+          word.traditional = match.groups.traditional;
+        });
         this.currentWord = this.words[0];
       },
     });
