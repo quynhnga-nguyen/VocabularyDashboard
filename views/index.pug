@@ -19,7 +19,7 @@ block content
         td(colspan='3', class='definition')
           span {{pinyinAndDef.definition}}
 
-  script. 
+  script.
     var app6 = new Vue({
       el: '#flashcard-tbl',
       data: {
@@ -31,7 +31,7 @@ block content
       },
       methods: {
         displayNext: function() {
-          this.currentIdx = (this.currentIdx + 1) % 2;
+          this.currentIdx = Math.floor(Math.random() * this.words.length);
           this.currentWord = this.words[this.currentIdx];
         },
         flipSide: function() {
