@@ -12,26 +12,36 @@ function concatDefinitions(definitions) {
   return concat;
 }
 
-function getHanViet(word) {
+async function getHanViet(words) {
   var characters = [];
-  for (var i = 0; i < word.length; i++) {
-    characters.push(word[i]);
-  }
+  words.forEach(function(word) {
+    for (var i = 0; i < word.Word.length && word.Word[i] != ' '; i++) {
+      characters.push(word.Word[i]);
+    }
+  });
 
-  db.all(`SELECT HanViet, Character FROM HanVietDictionary
-          WHERE Character IN (?)`,
-        [characters.toString()], (err, items) => {
-          if (err) {
-            throw err;
-          }
+  var sql = "SELECT HanViet, Character FROM HanVietDictionary WHERE Character IN ("
+                + characters.map(function() { return "?" }).join(",")
+                + ")";
 
-          var hanvietDictionary = {};
-          items.forEach(function(item) {
-            hanviet[item.Character] = item.HanViet;
-          });
+  var query = function(resolve, reject) {
+    db.all(
+      sql, characters, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+  };
 
-          return hanvietDictionary;
-        });
+  var rows = await new Promise(query);
+  var hanvietDictionary = {};
+  rows.forEach(function(row) {
+    hanvietDictionary[row.Character] = row.HanViet;
+  });
+
+  return hanvietDictionary;
 }
 
 function aggregate(words) {
@@ -57,25 +67,29 @@ function aggregate(words) {
   return wordList;
 }
 
-function getTodayWords() {
+async function getTodayWords() {
   var timeRangeInSeconds = 24 * 60 * 60 * 1000; // one day
   var query = function(resolve, reject) {
     db.all(`SELECT DISTINCT FrequencyReports.Word, Pinyin, Definition 
-              FROM FrequencyReports
-              INNER JOIN PinyinAndDefinitions
-              ON FrequencyReports.Word = PinyinAndDefinitions.Word
-              WHERE Timestamp > (date('now') - ?);`,
-              [timeRangeInSeconds], (err, items) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve(items);
-                }
-              })
+            FROM FrequencyReports
+            INNER JOIN PinyinAndDefinitions
+            ON FrequencyReports.Word = PinyinAndDefinitions.Word
+            WHERE Timestamp > (date('now') - ?);`,
+            [timeRangeInSeconds], (err, rows) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(rows);
+              }
+            });
   };
 
-  return (new Promise(query))
-          .then(aggregate);
+  var rows = await new Promise(query);
+
+  return {
+    "words": aggregate(rows),
+    "hanviet": await getHanViet(rows),
+  };
 }
 
 var express = require('express');
@@ -114,7 +128,7 @@ db.exec(`
 router.get('/', function(req, res, next) {
   (async() => {
     var todayWords = await getTodayWords();
-    res.render('index', { words: todayWords });
+    res.render('index', todayWords);
   })();
 });
 
