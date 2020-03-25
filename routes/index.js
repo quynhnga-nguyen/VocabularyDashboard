@@ -55,11 +55,11 @@ function aggregate(words) {
 
     var item = wordList.find(item => item.word === word.Word);
     if (item) {
-      item.pinyinAndDefinition.push(pyAndDef);
+      item.pinyinAndDefinitions.push(pyAndDef);
     } else {
       wordList.push({
         "word": word.Word,
-        "pinyinAndDefinition": [pyAndDef]
+        "pinyinAndDefinitions": [pyAndDef]
       });
     }
   });
