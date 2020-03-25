@@ -20,7 +20,7 @@ block content
           span {{pinyinAndDef.definition}}
 
   script.
-    var app6 = new Vue({
+    var flashcard = new Vue({
       el: '#flashcard-tbl',
       data: {
         words: !{JSON.stringify(words)},
@@ -52,5 +52,5 @@ block content
       },
     });
 
-    setInterval(function() { app6.flipSide(); }, 3000);
-    setInterval(function() { app6.displayNext(); }, 12000);
+    setInterval(function() { flashcard.flipSide(); }, 3000);
+    setInterval(function() { flashcard.displayNext(); }, 12000);
