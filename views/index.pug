@@ -8,7 +8,7 @@ block content
     tr(class='front', v-if='currentSide === "front"')
       th(class='traditional', v-for='char in currentWord.traditional') {{char}}
     tr(class='front', v-if='currentSide === "front"')
-      td(class='hanviet', v-for='hv in currentWord.hanviet') {{hv}}
+      td(class='hanviet', v-for='char in currentWord.simplified') [{{currentWord.hanviet[char]}}]
 
     template(v-for='pinyinAndDef in currentWord.pinyinAndDefinitions')
       tr(class='back', v-if='currentSide === "back"')
