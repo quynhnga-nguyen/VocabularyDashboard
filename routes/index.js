@@ -68,14 +68,61 @@ function aggregate(words) {
 }
 
 async function getTodayWords() {
-  var timeRangeInSeconds = 24 * 60 * 60 * 1000; // one day
+  const TIME_RANGE_IN_SECONDS = 24 * 60 * 60 * 1000; // one day
   var query = function(resolve, reject) {
     db.all(`SELECT DISTINCT FrequencyReports.Word, Pinyin, Definition 
             FROM FrequencyReports
             INNER JOIN PinyinAndDefinitions
             ON FrequencyReports.Word = PinyinAndDefinitions.Word
             WHERE Timestamp > (date('now') - ?);`,
-            [timeRangeInSeconds], (err, rows) => {
+            [TIME_RANGE_IN_SECONDS], (err, rows) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(rows);
+              }
+            });
+  };
+
+  var rows = await new Promise(query);
+
+  return {
+    "words": aggregate(rows),
+    "hanviet": await getHanViet(rows),
+  };
+}
+
+async function getRandomWords() {
+  const RANDOM_WORDS_PER_DAY = 100;
+  const HIGH_FREQUENCY = 2;
+  const HIGH_FREQUENCY_SELECTION_RATIO = 0.5;
+
+  var numberOfHighFreqWords = RANDOM_WORDS_PER_DAY * HIGH_FREQUENCY_SELECTION_RATIO;
+  var numberOfLowFreqWords = RANDOM_WORDS_PER_DAY - numberOfHighFreqWords;
+
+  var query = function(resolve, reject) {
+    db.all(`SELECT RandomWords.Word, PinyinAndDefinitions.Pinyin, PinyinAndDefinitions.Definition
+            FROM (
+              SELECT * FROM (
+                SELECT FrequencyReports.Word, count(FrequencyReports.Frequency) AS TotalFrequency
+                FROM FrequencyReports
+                GROUP BY FrequencyReports.Word
+                HAVING TotalFrequency >= ?
+                ORDER BY RANDOM() LIMIT ?
+              )
+              UNION ALL
+              SELECT * FROM (
+                SELECT FrequencyReports.Word, count(FrequencyReports.Frequency) AS TotalFrequency
+                FROM FrequencyReports
+                GROUP BY FrequencyReports.Word
+                HAVING TotalFrequency < ?
+                ORDER BY RANDOM() LIMIT ?
+              )
+            ) RandomWords
+            INNER JOIN PinyinAndDefinitions
+            ON RandomWords.Word = PinyinAndDefinitions.Word;`,
+            [HIGH_FREQUENCY, numberOfHighFreqWords, HIGH_FREQUENCY, numberOfLowFreqWords],
+            (err, rows) => {
               if (err) {
                 reject(err);
               } else {
@@ -128,7 +175,12 @@ db.exec(`
 router.get('/', function(req, res, next) {
   (async() => {
     var todayWords = await getTodayWords();
-    res.render('index', todayWords);
+    var randomWords = await getRandomWords();
+    res.render('index',
+                {
+                  "words": todayWords.words.concat(randomWords.words),
+                  "hanviet": Object.assign({}, todayWords.hanviet, randomWords.hanviet),
+                });
   })();
 });
 
