@@ -19,6 +19,7 @@ block content
         td(colspan='3', class='definition')
           span {{pinyinAndDef.definition}}
 
+
   script.
     var flashcard = new Vue({
       el: '#flashcard-tbl',
@@ -47,6 +48,10 @@ block content
           let match = /(?<simplified>[^ ]*)(?: \[(?<traditional>.*)\])?/.exec(word.word);
           word.simplified = match.groups.simplified;
           word.traditional = match.groups.traditional;
+          
+          word.pinyinAndDefinitions.forEach(pyDef => {
+            pyDef.definition = pyDef.definition.replace(/\|/g, " • ");
+          });
         });
         this.currentWord = this.words[0];
       },
