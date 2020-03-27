@@ -72,9 +72,11 @@ async function getTodayWords() {
   var query = function(resolve, reject) {
     db.all(`SELECT DISTINCT FrequencyReports.Word, Pinyin, Definition 
             FROM FrequencyReports
+            LEFT JOIN IgnoredWords
+            ON FrequencyReports.Word = IgnoredWords.Word
             INNER JOIN PinyinAndDefinitions
             ON FrequencyReports.Word = PinyinAndDefinitions.Word
-            WHERE Timestamp > (date('now') - ?);`,
+            WHERE IgnoredWords.Word IS NULL AND Timestamp > (date('now') - ?);`,
             [TIME_RANGE_IN_SECONDS], (err, rows) => {
               if (err) {
                 reject(err);
@@ -101,21 +103,25 @@ async function getRandomWords() {
   var numberOfLowFreqWords = RANDOM_WORDS_PER_DAY - numberOfHighFreqWords;
 
   var query = function(resolve, reject) {
-    db.all(`SELECT RandomWords.Word, PinyinAndDefinitions.Pinyin, PinyinAndDefinitions.Definition
+    db.all(`SELECT RandomWords.Word, Pinyin, Definition
             FROM (
               SELECT * FROM (
-                SELECT FrequencyReports.Word, count(FrequencyReports.Frequency) AS TotalFrequency
+                SELECT FrequencyReports.Word, count(Frequency) AS TotalFrequency
                 FROM FrequencyReports
+                LEFT JOIN IgnoredWords
+                ON FrequencyReports.Word = IgnoredWords.Word
                 GROUP BY FrequencyReports.Word
-                HAVING TotalFrequency >= ?
+                HAVING TotalFrequency >= ? AND IgnoredWords.Word IS NULL
                 ORDER BY RANDOM() LIMIT ?
               )
               UNION ALL
               SELECT * FROM (
-                SELECT FrequencyReports.Word, count(FrequencyReports.Frequency) AS TotalFrequency
+                SELECT FrequencyReports.Word, count(Frequency) AS TotalFrequency
                 FROM FrequencyReports
+                LEFT JOIN IgnoredWords
+                ON FrequencyReports.Word = IgnoredWords.Word
                 GROUP BY FrequencyReports.Word
-                HAVING TotalFrequency < ?
+                HAVING TotalFrequency < ? AND IgnoredWords.Word IS NULL
                 ORDER BY RANDOM() LIMIT ?
               )
             ) RandomWords
@@ -168,6 +174,10 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS HanVietDictionary (
     Character TEXT NOT NULL PRIMARY KEY,
     HanViet TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS IgnoredWords (
+    Word TEXT NOT NULL PRIMARY KEY
   );
 `);
 
