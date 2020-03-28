@@ -32,12 +32,12 @@ td {
 }
 
 .simplified {
-  font: 220px Verdana, sans-serif;
+  font: 220px 'Noto Serif SC', serif;
   line-height: 95%;
 }
 
 .traditional {
-  font: 160px Verdana, sans-serif;
+  font: 160px 'Noto Serif SC', serif;
   color: grey;
 }
 
