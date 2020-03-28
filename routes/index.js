@@ -231,4 +231,12 @@ router.post('/hvreport', function(req, res) {
   res.send('Acknowledged.');
 });
 
+router.post('/toBeIgnored', function(req, res) {
+  // request body sample: "罢了 [罷-]"
+  // console.log(req.body);
+  var word = req.body["word"];
+  db.run("INSERT INTO IgnoredWords (Word) VALUES (?);", word);
+  res.send('Acknowledged.');
+});
+
 module.exports = router;
