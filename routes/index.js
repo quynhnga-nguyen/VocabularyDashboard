@@ -232,10 +232,10 @@ router.post('/hvreport', function(req, res) {
 });
 
 router.post('/toBeIgnored', function(req, res) {
-  // request body sample: "罢了 [罷-]"
+  // request body sample: {"word":罢了 [罷-]"}
   // console.log(req.body);
   var word = req.body["word"];
-  db.run("INSERT INTO IgnoredWords (Word) VALUES (?);", word);
+  db.run("INSERT OR IGNORE INTO IgnoredWords (Word) VALUES (?);", word);
   res.send('Acknowledged.');
 });
 
