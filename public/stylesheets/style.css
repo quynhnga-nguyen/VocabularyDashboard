@@ -16,6 +16,7 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: white;
+  min-width: 750px;
 }
 
 table {
@@ -39,11 +40,13 @@ td {
 .traditional {
   font: 160px 'Noto Serif SC', serif;
   color: grey;
+  line-height: 95%;
+  padding-top: 20px;
 }
 
 .pinyin {
   color: gray;
-  padding-top: 30px;
+  padding-top: 15px;
   padding-bottom: 10px;
   font: 40px 'Cabin', sans-serif;
 }
@@ -51,6 +54,7 @@ td {
 .hanviet {
   font-style: italic;
   color: gray;
+  padding-top: 20px;
   padding-bottom: 10px;
 }
 
