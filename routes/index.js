@@ -13,13 +13,14 @@ function concatDefinitions(definitions) {
 }
 
 async function getHanViet(words) {
-  var characters = [];
+  let characterSet = new Set();
   words.forEach(function(word) {
     for (var i = 0; i < word.Word.length && word.Word[i] != ' '; i++) {
-      characters.push(word.Word[i]);
+      characterSet.add(word.Word[i]);
     }
   });
 
+  let characters = Array.from(characterSet);
   var sql = "SELECT HanViet, Character FROM HanVietDictionary WHERE Character IN ("
                 + characters.map(function() { return "?" }).join(",")
                 + ")";
@@ -232,7 +233,7 @@ router.post('/hvreport', function(req, res) {
 });
 
 router.post('/toBeIgnored', function(req, res) {
-  // request body sample: {"word":罢了 [罷-]"}
+  // request body sample: {"word":"罢了 [罷-]"}
   // console.log(req.body);
   var word = req.body["word"];
   db.run("INSERT OR IGNORE INTO IgnoredWords (Word) VALUES (?);", word);
