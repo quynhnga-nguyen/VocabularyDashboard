@@ -69,16 +69,21 @@ function aggregate(words) {
 }
 
 async function getTodayWords() {
-  const TIME_RANGE_IN_SECONDS = 24 * 60 * 60 * 1000; // one day
+  const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;
+
   var query = function(resolve, reject) {
-    db.all(`SELECT DISTINCT FrequencyReports.Word, Pinyin, Definition 
+    db.all(`SELECT
+              DISTINCT FrequencyReports.Word, Pinyin, Definition
             FROM FrequencyReports
             LEFT JOIN IgnoredWords
             ON FrequencyReports.Word = IgnoredWords.Word
             INNER JOIN PinyinAndDefinitions
             ON FrequencyReports.Word = PinyinAndDefinitions.Word
-            WHERE IgnoredWords.Word IS NULL AND Timestamp > (date('now') - ?);`,
-            [TIME_RANGE_IN_SECONDS], (err, rows) => {
+            WHERE
+              IgnoredWords.Word IS NULL
+              AND Timestamp > ((julianday('now') - 2440587.5) * 86400.0 * 1000 - ?)
+            ORDER BY RANDOM() LIMIT 100;`,
+            [ONE_DAY_IN_MS], (err, rows) => {
               if (err) {
                 reject(err);
               } else {
