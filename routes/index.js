@@ -203,8 +203,7 @@ router.get('/', function(req, res, next) {
 router.post('/freqreport', function(req, res) {
   // request body sample: [{"word":"罢了 [罷-]","frequency":1,"lastLookupTime":1584873114918,
   // "pinyinAndDefinition":[{"pinyin":"bàle","definition":["a modal particle indicating (that's all, only, nothing much)"]}]}
-  // console.log(req.body);
-  var frequencyReport = req.body;
+  var frequencyReport = JSON.parse(req.body);
 
   frequencyReport.forEach(function(item) {
     db.run("INSERT INTO FrequencyReports (Word, Frequency, Timestamp) VALUES (?, ?, ?);",
@@ -225,8 +224,7 @@ router.post('/freqreport', function(req, res) {
 
 router.post('/hvreport', function(req, res) {
   // request body sample: {"内":"nội, nạp","向":"hướng"}
-  // console.log(req.body);
-  var hanvietReport = req.body;
+  var hanvietReport = JSON.parse(req.body);
 
   for (const character of Object.keys(hanvietReport)) {
     db.run("INSERT OR IGNORE INTO HanVietDictionary (Character, HanViet) VALUES (?, ?);",
