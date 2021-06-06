@@ -151,9 +151,9 @@ async function getRandomWords() {
   };
 }
 
-var express = require('express');
+import express from 'express';
 var router = express.Router();
-const sqlite3 = require('sqlite3').verbose();
+import sqlite3 from 'sqlite3';
 
 let db = new sqlite3.Database('./db/vocab.db', (err) => {
   if (err) {
@@ -243,4 +243,4 @@ router.post('/toBeIgnored', function(req, res) {
   res.send('Acknowledged.');
 });
 
-module.exports = router;
+export default router;
